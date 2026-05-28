@@ -10,6 +10,7 @@ export type FontFamily = "sans" | "serif" | "mono";
 export type FontSize = "small" | "medium" | "large";
 export type LineHeight = "compact" | "normal" | "relaxed";
 export type ContentWidth = "narrow" | "medium" | "wide";
+export type EditorMode = "journaling" | "markdown";
 
 export interface Preferences {
   theme: Theme;
@@ -19,6 +20,7 @@ export interface Preferences {
   contentWidth: ContentWidth;
   focusModeDefault: boolean;
   typwriterMode: boolean;
+  editorMode: EditorMode;
 }
 
 const DEFAULTS: Preferences = {
@@ -29,6 +31,7 @@ const DEFAULTS: Preferences = {
   contentWidth: "medium",
   focusModeDefault: false,
   typwriterMode: false,
+  editorMode: "journaling",
 };
 
 export function usePreferences() {

@@ -8,6 +8,7 @@ import {
   type FontSize,
   type LineHeight,
   type ContentWidth,
+  type EditorMode,
 } from "@/lib/hooks/usePreferences";
 import { THEMES, themeLabels, type Theme } from "@/lib/themes/tokens";
 import { cn } from "@/lib/utils";
@@ -211,21 +212,53 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
 
           {/* ── Editor ── */}
           {tab === "editor" && (
-            <section>
-              <p className="text-[10.5px] font-bold uppercase tracking-widest text-text-secondary mb-1">Behaviour</p>
-              <ToggleRow
-                label="Focus mode by default"
-                description="Open every document in focus mode."
-                checked={prefs.focusModeDefault}
-                onChange={(v) => updatePrefs({ focusModeDefault: v })}
-              />
-              <ToggleRow
-                label="Typewriter mode"
-                description="Keep the active line centred vertically."
-                checked={prefs.typwriterMode}
-                onChange={(v) => updatePrefs({ typwriterMode: v })}
-              />
-            </section>
+            <>
+              <section>
+                <p className="text-[10.5px] font-bold uppercase tracking-widest text-text-secondary mb-2">Editor mode</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {([ "journaling", "markdown" ] as EditorMode[]).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => updatePrefs({ editorMode: mode })}
+                      className={cn(
+                        "flex flex-col gap-1.5 p-3 rounded-xl border-2 text-left transition-all",
+                        prefs.editorMode === mode
+                          ? "border-accent bg-accent/[0.06]"
+                          : "border-border hover:border-text-secondary/30 bg-hover"
+                      )}
+                    >
+                      <span className={cn(
+                        "text-[13px] font-semibold",
+                        prefs.editorMode === mode ? "text-accent" : "text-text-primary"
+                      )}>
+                        {mode === "journaling" ? "Journaling" : "Markdown"}
+                      </span>
+                      <span className="text-[11.5px] font-normal text-text-secondary leading-snug">
+                        {mode === "journaling"
+                          ? "Markdown renders live as you type. No raw syntax visible."
+                          : "Write raw markdown on the left, see the preview on the right."}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <p className="text-[10.5px] font-bold uppercase tracking-widest text-text-secondary mb-1">Behaviour</p>
+                <ToggleRow
+                  label="Focus mode by default"
+                  description="Open every document in focus mode."
+                  checked={prefs.focusModeDefault}
+                  onChange={(v) => updatePrefs({ focusModeDefault: v })}
+                />
+                <ToggleRow
+                  label="Typewriter mode"
+                  description="Keep the active line centred vertically."
+                  checked={prefs.typwriterMode}
+                  onChange={(v) => updatePrefs({ typwriterMode: v })}
+                />
+              </section>
+            </>
           )}
 
           {/* ── Account ── */}

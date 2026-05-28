@@ -54,9 +54,13 @@ async function initUserProfile(user: User) {
   const isNewUser = !prefsSnap.exists();
 
   if (isNewUser) {
+    const systemDark =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
     writes.push(
       setDoc(prefsRef, {
-        theme: "light",
+        theme: systemDark ? "dark" : "light",
         fontFamily: "serif",
         fontSize: "medium",
         lineHeight: "normal",

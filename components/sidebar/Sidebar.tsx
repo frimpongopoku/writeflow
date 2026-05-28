@@ -4,6 +4,7 @@ import { PenLine, Settings, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/firebase/auth-context";
 import { FolderList } from "./FolderList";
+import versionData from "@/version.json";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -51,7 +52,14 @@ export function Sidebar({ collapsed, onToggle, onOpenSettings }: SidebarProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-2.5 px-3 py-2.5 border-t border-border shrink-0">
+        <div className="flex flex-col border-t border-border shrink-0">
+          {/* Version */}
+          <div className="px-4 pt-2 pb-1">
+            <span className="text-[10px] font-medium text-text-secondary/40 select-none">
+              v{versionData.version} {versionData.stage}
+            </span>
+          </div>
+          <div className="flex items-center gap-2.5 px-3 py-2.5">
           {user?.photoURL ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={user.photoURL} alt="" className="size-6 rounded-full shrink-0 ring-1 ring-border" />
@@ -70,6 +78,7 @@ export function Sidebar({ collapsed, onToggle, onOpenSettings }: SidebarProps) {
           >
             <Settings className="size-[13px]" />
           </button>
+          </div>
         </div>
 
         {/* Collapse button — bottom of expanded sidebar */}
