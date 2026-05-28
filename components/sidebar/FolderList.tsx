@@ -125,13 +125,13 @@ export function FolderList() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-36">
                   <DropdownMenuItem onClick={() => startRename(folder.id, folder.name)}>
-                    <Pencil className="size-3 mr-2" /> Rename
+                    <Pencil /> Rename
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
+                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
                     onClick={() => deleteFolder(folder.id)}
                   >
-                    <Trash className="size-3 mr-2" /> Delete
+                    <Trash className="text-destructive" /> Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

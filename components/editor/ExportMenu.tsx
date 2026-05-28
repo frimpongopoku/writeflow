@@ -45,15 +45,15 @@ export function ExportMenu({ title, content }: ExportMenuProps) {
           <MoreHorizontal className="size-3.5" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48" style={{ fontFamily: "var(--font-ui)" }}>
-        <DropdownMenuItem onClick={downloadMarkdown} className="gap-2.5">
-          <Download className="size-3.5" />
-          <span className="text-[13px]">Download as .md</span>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={downloadMarkdown}>
+          <Download />
+          Download as .md
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={copyToClipboard} className="gap-2.5">
-          {copied ? <Check className="size-3.5 text-accent" /> : <Copy className="size-3.5" />}
-          <span className="text-[13px]">{copied ? "Copied!" : "Copy to clipboard"}</span>
+        <DropdownMenuItem onClick={copyToClipboard}>
+          {copied ? <Check className="text-accent" /> : <Copy />}
+          {copied ? "Copied!" : "Copy to clipboard"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

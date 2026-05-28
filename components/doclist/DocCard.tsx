@@ -73,11 +73,14 @@ export function DocCard({ doc, isActive, onClick, onDelete, onRestore }: DocCard
         <DropdownMenuContent align="end" className="w-40" onClick={(e) => e.stopPropagation()}>
           {doc.isDeleted && onRestore ? (
             <DropdownMenuItem onClick={onRestore}>
-              <RotateCcw className="size-3.5 mr-2" /> Restore
+              <RotateCcw /> Restore
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onDelete}>
-              <Trash2 className="size-3.5 mr-2" /> Move to Trash
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive focus:bg-destructive/10"
+              onClick={onDelete}
+            >
+              <Trash2 className="text-destructive" /> Move to Trash
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
