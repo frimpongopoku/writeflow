@@ -6,6 +6,7 @@ import { useEditorState } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import { Bold, Italic, Strikethrough, Code, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AIPopover } from "./AIPopover";
 
 interface FloatingToolbarProps {
   editor: Editor;
@@ -18,6 +19,8 @@ interface ToolbarPos {
 
 export function FloatingToolbar({ editor }: FloatingToolbarProps) {
   const [pos, setPos] = useState<ToolbarPos | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [savedSelection, setSavedSelection] = useState<{ from: number; to: number } | null>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   const { hasSelection, isBold, isItalic, isStrike, isCode } = useEditorState({
@@ -34,6 +37,8 @@ export function FloatingToolbar({ editor }: FloatingToolbarProps) {
   useEffect(() => {
     if (!hasSelection) {
       setPos(null);
+      setAiOpen(false);
+      setSavedSelection(null);
       return;
     }
 
@@ -50,16 +55,27 @@ export function FloatingToolbar({ editor }: FloatingToolbarProps) {
       return;
     }
 
-    const toolbarWidth = toolbarRef.current?.offsetWidth ?? 200;
+    const toolbarWidth = toolbarRef.current?.offsetWidth ?? 220;
     setPos({
       top: rect.top + window.scrollY - 48,
       left: rect.left + window.scrollX + rect.width / 2 - toolbarWidth / 2,
     });
   }, [hasSelection]);
 
+  function openAI() {
+    const { from, to } = editor.state.selection;
+    setSavedSelection({ from, to });
+    setAiOpen(true);
+  }
+
+  function closeAI() {
+    setAiOpen(false);
+    setSavedSelection(null);
+  }
+
   if (!pos || !hasSelection) return null;
 
-  const buttons = [
+  const fmtButtons = [
     {
       label: "Bold",
       icon: <Bold className="size-3.5" />,
@@ -90,35 +106,47 @@ export function FloatingToolbar({ editor }: FloatingToolbarProps) {
     <div
       ref={toolbarRef}
       style={{ top: pos.top, left: pos.left, fontFamily: "var(--font-ui)" }}
-      className="fixed z-50 flex items-center gap-0.5 rounded-lg border border-border bg-popup shadow-lg p-1 pointer-events-auto"
+      className="fixed z-50 rounded-lg border border-border bg-popup shadow-lg pointer-events-auto"
     >
-      {buttons.map((btn) => (
-        <button
-          key={btn.label}
-          onMouseDown={(e) => {
-            e.preventDefault(); // keep selection alive
-            btn.action();
-          }}
-          aria-label={btn.label}
-          className={cn(
-            "flex items-center justify-center size-7 rounded-md transition-colors",
-            btn.isActive
-              ? "bg-accent text-white font-semibold"
-              : "text-text-primary hover:bg-hover"
-          )}
-        >
-          {btn.icon}
-        </button>
-      ))}
+      {aiOpen && savedSelection ? (
+        <AIPopover
+          editor={editor}
+          selectionFrom={savedSelection.from}
+          selectionTo={savedSelection.to}
+          onClose={closeAI}
+        />
+      ) : (
+        <div className="flex items-center gap-0.5 p-1">
+          {fmtButtons.map((btn) => (
+            <button
+              key={btn.label}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                btn.action();
+              }}
+              aria-label={btn.label}
+              className={cn(
+                "flex items-center justify-center size-7 rounded-md transition-colors",
+                btn.isActive
+                  ? "bg-accent text-white font-semibold"
+                  : "text-text-primary hover:bg-hover"
+              )}
+            >
+              {btn.icon}
+            </button>
+          ))}
 
-      <div className="w-px h-4 bg-border mx-0.5" />
+          <div className="w-px h-4 bg-border mx-0.5" />
 
-      <button
-        aria-label="AI actions"
-        className="flex items-center justify-center size-7 rounded-md text-text-secondary hover:text-accent hover:bg-accent/10 transition-colors"
-      >
-        <Sparkles className="size-3.5" />
-      </button>
+          <button
+            onMouseDown={(e) => { e.preventDefault(); openAI(); }}
+            aria-label="AI actions"
+            className="flex items-center justify-center size-7 rounded-md text-text-secondary hover:text-accent hover:bg-accent/10 transition-colors"
+          >
+            <Sparkles className="size-3.5" />
+          </button>
+        </div>
+      )}
     </div>,
     document.body
   );

@@ -1,5 +1,15 @@
 # WriteFlow — Decision Log
 
+## [AI] claude-haiku-4-5 for AI actions, non-streaming JSON response
+**Decision:** AI actions use `claude-haiku-4-5-20251001` via a POST `/api/ai` route that returns `{ result }` as plain JSON.
+**Reason:** Haiku is fast and cheap for short rewrite tasks. Non-streaming keeps the popover logic simple — show a spinner, then display the full result for Accept/Dismiss.
+**Date:** 2026-05-29
+
+## [AI] AIPopover is a state machine inside the FloatingToolbar portal
+**Decision:** The AI action UI lives in `AIPopover.tsx`, rendered inside the same portal div as `FloatingToolbar`. The toolbar switches between formatting buttons and the AIPopover when Sparkles is clicked. Selection coordinates are captured at click time and stored in `savedSelection` so they survive the focus shift.
+**Reason:** Rendering inside the same portal div avoids a second absolute-positioned element and keeps positioning logic in one place.
+**Date:** 2026-05-29
+
 ## [Setup] Use Tailwind v4 (CSS-first config)
 **Decision:** The scaffolded Next.js 15 project uses Tailwind v4, which has no `tailwind.config.ts`. Theme tokens are defined via `@theme inline` in `globals.css` and referenced as CSS custom properties.
 **Reason:** `create-next-app` installs Tailwind v4 by default as of May 2026. No config file regression needed.
