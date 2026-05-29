@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import Image from "@tiptap/extension-image";
 import { Markdown } from "tiptap-markdown";
 import { useDocument } from "@/lib/hooks/useDocument";
 import { usePreferences } from "@/lib/hooks/usePreferences";
@@ -43,6 +44,7 @@ export function Editor({ docId, folderId }: EditorProps) {
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialized = useRef(false);
+  const suppressNextUpdate = useRef(false);
   const titleRef = useRef(title);
   titleRef.current = title;
   const contentRef = useRef(content);
@@ -80,15 +82,19 @@ export function Editor({ docId, folderId }: EditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+      Image.configure({ inline: false }),
       Markdown,
       Placeholder.configure({ placeholder: "Start writing…" }),
     ],
     editorProps: { attributes: { class: "tiptap-editor outline-none" } },
     onUpdate({ editor: e }) {
+      if (suppressNextUpdate.current) {
+        suppressNextUpdate.current = false;
+        return;
+      }
       const md = getMd(e);
       const text = e.getText();
       const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      // Keep shared content state in sync so switching to markdown mode shows latest
       setContent(md);
       setWordCount(words);
       setCharCount(text.length);
@@ -104,6 +110,7 @@ export function Editor({ docId, folderId }: EditorProps) {
     setTitle(wfDoc.title);
     setContent(wfDoc.content);
     if (editor && wfDoc.content) {
+      suppressNextUpdate.current = true;
       editor.commands.setContent(wfDoc.content);
     }
     const words = wfDoc.content.trim() ? wfDoc.content.trim().split(/\s+/).length : 0;
@@ -115,7 +122,7 @@ export function Editor({ docId, folderId }: EditorProps) {
   /* ── Sync content INTO Tiptap when switching TO journaling mode ──── */
   useEffect(() => {
     if (!isMarkdownMode && editor && initialized.current) {
-      // Push the latest markdown string into Tiptap so it renders correctly
+      suppressNextUpdate.current = true;
       editor.commands.setContent(contentRef.current);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

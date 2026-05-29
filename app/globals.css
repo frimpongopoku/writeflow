@@ -214,6 +214,14 @@ body {
   text-underline-offset: 2px;
 }
 
+.tiptap-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+  display: block;
+}
+
 .tiptap-editor .is-editor-empty::before {
   content: attr(data-placeholder);
   /* Use secondary text directly — already has proper contrast without opacity hacks */

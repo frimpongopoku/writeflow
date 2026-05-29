@@ -20,10 +20,10 @@ export function MarkdownEditor({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Preserve indentation on Enter
+    const ta = e.currentTarget;
+
     if (e.key === "Tab") {
       e.preventDefault();
-      const ta = e.currentTarget;
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
       const next = ta.value.slice(0, start) + "  " + ta.value.slice(end);
@@ -31,6 +31,46 @@ export function MarkdownEditor({
       requestAnimationFrame(() => {
         ta.selectionStart = ta.selectionEnd = start + 2;
       });
+      return;
+    }
+
+    if (e.key === "Enter") {
+      const start = ta.selectionStart;
+      const value = ta.value;
+      const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+      const currentLine = value.slice(lineStart, start);
+
+      const unordered = currentLine.match(/^(\s*)([-*+]) /);
+      const ordered = currentLine.match(/^(\s*)(\d+)\. /);
+      const match = unordered ?? ordered;
+      if (!match) return;
+
+      e.preventDefault();
+      const prefixLen = match[0].length;
+      const lineContent = currentLine.slice(prefixLen);
+
+      if (lineContent.trim() === "") {
+        // Empty list item — exit the list by removing the bullet
+        const newValue = value.slice(0, lineStart) + value.slice(start);
+        onContentChange(newValue);
+        requestAnimationFrame(() => {
+          ta.selectionStart = ta.selectionEnd = lineStart;
+        });
+      } else {
+        // Continue the list
+        let bullet: string;
+        if (unordered) {
+          bullet = `\n${unordered[1]}${unordered[2]} `;
+        } else {
+          bullet = `\n${ordered![1]}${parseInt(ordered![2]) + 1}. `;
+        }
+        const newValue = value.slice(0, start) + bullet + value.slice(start);
+        const newPos = start + bullet.length;
+        onContentChange(newValue);
+        requestAnimationFrame(() => {
+          ta.selectionStart = ta.selectionEnd = newPos;
+        });
+      }
     }
   }, [onContentChange]);
 
@@ -94,7 +134,16 @@ export function MarkdownEditor({
           <div className="flex-1 overflow-y-auto px-8 py-6">
             {content.trim() ? (
               <div className="tiptap-editor">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    img({ src, alt }) {
+                      if (!src) return null;
+                      // eslint-disable-next-line @next/next/no-img-element
+                      return <img src={src} alt={alt ?? ""} style={{ maxWidth: "100%", height: "auto", borderRadius: "6px", margin: "0.5rem 0", display: "block" }} />;
+                    },
+                  }}
+                >
                   {content}
                 </ReactMarkdown>
               </div>
