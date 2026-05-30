@@ -3,19 +3,24 @@
 import { useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { TagInput } from "./TagInput";
 
 interface MarkdownEditorProps {
   title: string;
   content: string;
+  tags: string[];
   onTitleChange: (t: string) => void;
   onContentChange: (c: string) => void;
+  onTagsChange: (tags: string[]) => void;
 }
 
 export function MarkdownEditor({
   title,
   content,
+  tags,
   onTitleChange,
   onContentChange,
+  onTagsChange,
 }: MarkdownEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -88,8 +93,9 @@ export function MarkdownEditor({
             fontSize: "calc(var(--wf-editor-size) * 1.85)",
             lineHeight: 1.2,
           }}
-          className="w-full font-bold text-text-primary bg-transparent border-none outline-none placeholder:text-text-secondary/25 tracking-tight"
+          className="w-full font-bold text-text-primary bg-transparent border-none outline-none placeholder:text-text-secondary/25 tracking-tight mb-3"
         />
+        <TagInput tags={tags} onChange={onTagsChange} />
       </div>
 
       {/* Split pane */}

@@ -12,6 +12,7 @@ export interface WFDocument {
   folderId: string;
   title: string;
   content: string;
+  tags: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
   wordCount: number;

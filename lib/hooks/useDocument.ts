@@ -32,7 +32,7 @@ export function useDocument(docId: string | null) {
   }, [user, docId]);
 
   const updateDocument = useCallback(
-    async (patch: Partial<Pick<WFDocument, "title" | "content" | "wordCount">>) => {
+    async (patch: Partial<Pick<WFDocument, "title" | "content" | "wordCount" | "tags">>) => {
       if (!user || !docId) return;
       await updateDoc(doc(db, "users", user.uid, "documents", docId), {
         ...patch,

@@ -12,6 +12,7 @@ import { useFocusMode } from "@/lib/hooks/useFocusMode";
 import { FloatingToolbar } from "./FloatingToolbar";
 import { StatsBar } from "./StatsBar";
 import { MarkdownEditor } from "./MarkdownEditor";
+import { TagInput } from "./TagInput";
 import { Loader2, Maximize2, Minimize2, Download, Copy, Check } from "lucide-react";
 
 type SaveStatus = "saved" | "saving" | "unsaved";
@@ -35,6 +36,7 @@ export function Editor({ docId, folderId }: EditorProps) {
   const { focusMode, toggleFocusMode } = useFocusMode();
 
   const [title, setTitle] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   // Single source of truth for the raw markdown string — both modes read/write this.
   const [content, setContent] = useState("");
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
@@ -49,6 +51,8 @@ export function Editor({ docId, folderId }: EditorProps) {
   titleRef.current = title;
   const contentRef = useRef(content);
   contentRef.current = content;
+  const tagsRef = useRef(tags);
+  tagsRef.current = tags;
 
   const isMarkdownMode = prefs.editorMode === "markdown";
 
@@ -71,7 +75,7 @@ export function Editor({ docId, folderId }: EditorProps) {
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(async () => {
         setSaveStatus("saving");
-        await updateDocument({ title: titleRef.current, content: md, wordCount: wc });
+        await updateDocument({ title: titleRef.current, content: md, wordCount: wc, tags: tagsRef.current });
         setSaveStatus("saved");
       }, AUTOSAVE_DELAY);
     },
@@ -108,6 +112,7 @@ export function Editor({ docId, folderId }: EditorProps) {
     if (!wfDoc || initialized.current) return;
     initialized.current = true;
     setTitle(wfDoc.title);
+    setTags(wfDoc.tags ?? []);
     setContent(wfDoc.content);
     if (editor && wfDoc.content) {
       suppressNextUpdate.current = true;
@@ -131,6 +136,11 @@ export function Editor({ docId, folderId }: EditorProps) {
   /* ── Handlers ────────────────────────────────────────────────────── */
   function handleTitleChange(newTitle: string) {
     setTitle(newTitle);
+    scheduleAutoSave(contentRef.current, wordCount);
+  }
+
+  function handleTagsChange(newTags: string[]) {
+    setTags(newTags);
     scheduleAutoSave(contentRef.current, wordCount);
   }
 
@@ -241,8 +251,10 @@ export function Editor({ docId, folderId }: EditorProps) {
         <MarkdownEditor
           title={title}
           content={content}
+          tags={tags}
           onTitleChange={handleTitleChange}
           onContentChange={handleMarkdownChange}
+          onTagsChange={handleTagsChange}
         />
         {statsBar}
       </div>
@@ -273,8 +285,11 @@ export function Editor({ docId, folderId }: EditorProps) {
               fontSize: "calc(var(--wf-editor-size) * 1.85)",
               lineHeight: 1.2,
             }}
-            className="w-full font-bold text-text-primary bg-transparent border-none outline-none placeholder:text-text-secondary/25 mb-8 tracking-tight"
+            className="w-full font-bold text-text-primary bg-transparent border-none outline-none placeholder:text-text-secondary/25 mb-3 tracking-tight"
           />
+          <div className="mb-7">
+            <TagInput tags={tags} onChange={handleTagsChange} />
+          </div>
           {editor && <FloatingToolbar editor={editor} />}
           <EditorContent editor={editor} />
         </div>
