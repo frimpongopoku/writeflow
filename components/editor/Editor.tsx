@@ -158,7 +158,16 @@ export function Editor({ docId, folderId }: EditorProps) {
         .replace(/[^a-z0-9\-_. ]/gi, "")
         .trim()
         .replace(/\s+/g, "-") + ".md";
-    const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+
+    const date = new Date().toISOString().slice(0, 10);
+    const plainText = content.replace(/[#*`~>\-_[\]()!]/g, "").trim();
+    const description = plainText.slice(0, 150).replace(/\n+/g, " ").trim();
+    const tagsYaml = tags.length > 0
+      ? `[${tags.map((t) => `"${t}"`).join(", ")}]`
+      : "[]";
+
+    const frontmatter = `---\ntitle: "${title.replace(/"/g, '\\"')}"\ndate: "${date}"\ndescription: "${description.replace(/"/g, '\\"')}"\ntags: ${tagsYaml}\npublished: true\n---\n\n`;
+    const blob = new Blob([frontmatter + content], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
