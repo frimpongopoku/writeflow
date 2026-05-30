@@ -40,7 +40,17 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "WriteFlow",
-  description: "A beautiful, distraction-free writing app.",
+  description: "A distraction-free WYSIWYG writing app with markdown, themes, and AI-powered editing.",
+  openGraph: {
+    title: "WriteFlow",
+    description: "A distraction-free WYSIWYG writing app with markdown, themes, and AI-powered editing.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "WriteFlow",
+    description: "A distraction-free WYSIWYG writing app with markdown, themes, and AI-powered editing.",
+  },
 };
 
 // Runs synchronously before first paint — no theme flash

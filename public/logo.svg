@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background -->
+  <rect width="200" height="200" rx="40" fill="#1a6bcf"/>
+
+  <!-- W — clean pen strokes -->
+  <path
+    d="M30 56 L58 138 L100 88 L142 138 L170 56"
+    stroke="white"
+    stroke-width="17"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Flow tail — the right leg of the W curves into a flowing underline -->
+  <path
+    d="M170 56 Q182 56 182 80 Q182 158 100 158 Q18 158 18 104"
+    stroke="rgba(255,255,255,0.30)"
+    stroke-width="8"
+    stroke-linecap="round"
+    fill="none"
+  />
+</svg>
